@@ -1,5 +1,6 @@
 import express from "express";
 import Produit from "../models/Produit_model.js";
+import Historique from "../models/Historique.js";
 
 const router = express.Router();
 
@@ -26,6 +27,12 @@ router.post("/", async (req, res) => {
         });
 
         await produit.save();
+
+        await Historique.create({
+            action: "AJOUT",
+            produitId: produit._id,
+            nouvelleValeur: produit.toObject()
+        });
 
         res.status(201).json({
             message: "Produit créé avec succès",
@@ -99,6 +106,13 @@ router.get("/:id", async (req, res) => {
 router.put("/:id", async (req, res) => {
 
     try {
+        const ancienProduit = await Produit.findById(req.params.id);
+
+        if (!ancienProduit) {
+            return res.status(404).json({
+                message: "Produit introuvable"
+            });
+        }
 
         const produit = await Produit.findByIdAndUpdate(
             req.params.id,
@@ -108,12 +122,12 @@ router.put("/:id", async (req, res) => {
                 runValidators: true
             }
         );
-
-        if (!produit) {
-            return res.status(404).json({
-                message: "Produit introuvable"
-            });
-        }
+        await Historique.create({
+            action: "MODIFICATION",
+            produitId: produit._id,
+            ancienneValeur: ancienProduit.toObject(),
+            nouvelleValeur: produit.toObject()
+        });
 
         res.status(200).json({
             message: "Produit modifié avec succès",
@@ -138,16 +152,21 @@ router.delete("/:id", async (req, res) => {
 
     try {
 
-        const produit = await Produit.findByIdAndDelete(
-            req.params.id
-        );
-
+        const produit = await Produit.findById(req.params.id);
+        
         if (!produit) {
             return res.status(404).json({
                 message: "Produit introuvable"
             });
         }
 
+        await Produit.findByIdAndDelete(req.params.id);
+
+        await Historique.create({
+            action: "SUPPRESSION",
+            produitId: produit._id,
+            ancienneValeur: produit.toObject()
+        });
         res.status(200).json({
             message: "Produit supprimé avec succès"
         });

@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link, NavLink } from "react-rou
 import Dashboard from "./components/Dashboard";
 import AjoutProduit from "./components/AjoutProduit";
 import MouvementStock from "./components/MouvementStock";
+import HistoriqueList from "./components/HistoriqueList";
 import "./App.css";
 
 function App() {
@@ -48,6 +49,13 @@ function App() {
                   <span className="item-text">Mouvements Stock</span>
                 </NavLink>
               </li>
+
+              <li>
+                <NavLink to="/historique" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
+                  <span className="item-icon">📜</span>
+                  <span className="item-text">Historique</span>
+                </NavLink>
+              </li>
             </ul>
           </div>
           
@@ -71,6 +79,7 @@ function App() {
                 </div>
               } />
               <Route path="/mouvement" element={<MouvementStock />} />
+              <Route path="/historique" element={<HistoriqueList />} />
             </Routes>
           </div>
         </main>
