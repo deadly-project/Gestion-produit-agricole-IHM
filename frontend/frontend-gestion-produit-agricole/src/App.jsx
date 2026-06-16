@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link, NavLink } from "react-router-dom";
 import Dashboard from "./components/Dashboard";
 import AjoutProduit from "./components/AjoutProduit";
+import MouvementStock from "./components/MouvementStock";
 import "./App.css";
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
                   <span className="item-text">Dashboard</span>
                 </NavLink>
               </li>
+
               <li>
                 <NavLink 
                   to="/ajouter" 
@@ -37,6 +39,13 @@ function App() {
                 >
                   <span className="item-icon">➕</span>
                   <span className="item-text">Ajouter produit</span>
+                </NavLink>
+              </li>
+
+              <li>
+                <NavLink to="/mouvement" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
+                  <span className="item-icon">🔄</span>
+                  <span className="item-text">Mouvements Stock</span>
                 </NavLink>
               </li>
             </ul>
@@ -61,6 +70,7 @@ function App() {
                   <Link to="/" className="btn-back">Retour au Tableau de Bord</Link>
                 </div>
               } />
+              <Route path="/mouvement" element={<MouvementStock />} />
             </Routes>
           </div>
         </main>
