@@ -83,7 +83,7 @@ const Dashboard = () => {
       <div className="kpi-grid">
         <div className="kpi-card">
           <div className="kpi-info">
-            <span className="kpi-label">Nombre de Références</span>
+            <span className="kpi-label">Nombre de Produits</span>
             <span className="kpi-value">{totalProduits}</span>
           </div>
           <div className="kpi-icon icon-box">📦</div>
@@ -154,7 +154,7 @@ const Dashboard = () => {
               className="form-input"
             >
               <option value="az">Nom : de A à Z</option>
-              <option value="qty_asc">Quantité : du + petit au + grand</option>
+              <option value="qty_asc">Quantité croissant</option>
             </select>
           </div>
           

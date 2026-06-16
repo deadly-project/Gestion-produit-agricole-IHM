@@ -1,65 +1,201 @@
-/* Structure globale */
+/* --- RESET & VARIABLES DE COULEURS --- */
+:root {
+  --bg-main: #f8fafc;        /* Gris ultra-léger et moderne pour le fond */
+  --sidebar-bg: #0f172a;     /* Bleu nuit profond (Slate 900) */
+  --sidebar-hover: #1e293b;  /* Slate 800 */
+  --accent-color: #3b82f6;   /* Bleu néon moderne */
+  --accent-light: rgba(59, 130, 246, 0.1);
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --text-white: #f8fafc;
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
 body {
   margin: 0;
-  background-color: #f4f6f9;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg-main);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
 }
 
 .app-layout {
   display: flex;
-  flex-direction: column;
+  flex-direction: row; 
   min-height: 100vh;
 }
 
-/* Style de la barre de navigation */
-.navbar {
+/* --- DESIGN DE LA SIDEBAR GAUCHE --- */
+.sidebar {
+  width: 280px;
+  background-color: var(--sidebar-bg);
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  box-sizing: border-box;
+  z-index: 10;
+  border-right: 1px solid #1e293b;
+}
+
+/* En-tête du Logo */
+.sidebar-header {
+  padding: 30px 24px;
+  display: flex;
   align-items: center;
-  background-color: #1e293b; /* Couleur sombre pro (slate) */
-  padding: 0 40px;
-  height: 65px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .nav-logo {
-  color: #ffffff;
-  font-size: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-icon {
+  font-size: 26px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+.logo-text {
+  color: var(--text-white);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.accent-text {
+  color: var(--accent-color);
+}
+
+/* Menu de navigation */
+.sidebar-menu {
+  flex: 1;
+  padding: 10px 16px;
+}
+
+.menu-divider {
+  display: block;
+  color: #475569;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
   font-weight: 700;
+  margin-bottom: 16px;
+  padding-left: 12px;
 }
 
 .nav-links {
   display: flex;
+  flex-direction: column;
   list-style: none;
   margin: 0;
   padding: 0;
-  gap: 20px;
+  gap: 8px;
 }
 
-/* Style des liens de navigation */
+/* Liens internes */
 .nav-item {
-  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #94a3b8; /* Texte tamisé au repos */
   text-decoration: none;
-  font-weight: 600;
-  padding: 8px 16px;
-  border-radius: 4px;
-  transition: all 0.2s ease;
+  font-weight: 500;
+  font-size: 15px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .nav-item:hover {
-  color: #ffffff;
-  background-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-white);
+  background-color: var(--sidebar-hover);
+  transform: translateX(4px); /* Petit effet de glissement dynamique */
 }
 
-/* Classe activée automatiquement par React Router */
+/* État actif du lien sélectionné */
 .nav-item.active {
-  color: #ffffff;
-  background-color: #007bff; /* Bleu d'accentuation */
+  color: var(--text-white);
+  background-color: var(--accent-color);
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
-/* Zone principale de rendu */
+.nav-item.active:hover {
+  transform: none;
+}
+
+/* Footer Sidebar */
+.sidebar-footer {
+  padding: 20px 24px;
+  border-top: 1px solid #1e293b;
+}
+
+.sidebar-footer p {
+  margin: 0;
+  font-size: 12px;
+  color: #475569;
+  font-weight: 500;
+}
+
+/* --- ZONE DE CONTENU (DROITE) --- */
 .content-area {
   flex: 1;
-  padding: 20px;
+  padding: 40px;
   box-sizing: border-box;
+  overflow-y: auto;
+  max-width: calc(100vw - 280px);
+}
+
+/* Envelopper le tableau et formulaires dans des cartes épurées */
+.content-card-wrapper {
+  animation: fadeInContent 0.4s ease-out;
+}
+
+/* Style de l'erreur 404 */
+.error-404 {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.error-404 h2 {
+  font-size: 28px;
+  color: #ef4444;
+  margin-bottom: 10px;
+}
+
+.error-404 p {
+  color: var(--text-muted);
+  margin-bottom: 25px;
+}
+
+.btn-back {
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: var(--accent-color);
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.btn-back:hover {
+  background-color: #2563eb;
+}
+
+/* Animation fluide à l'affichage des pages */
+@keyframes fadeInContent {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

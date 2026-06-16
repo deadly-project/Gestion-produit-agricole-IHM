@@ -8,50 +8,63 @@ function App() {
   return (
     <Router>
       <div className="app-layout">
-        {/* --- BARRE DE NAVIGATION (SIDEBAR OU TOPBAR) --- */}
-        <nav className="navbar">
-          <div className="nav-logo">
-            📦 StockAr
+        
+        {/* --- SIDEBAR DESIGN MODERNE --- */}
+        <nav className="sidebar">
+          <div className="sidebar-header">
+            <div className="nav-logo">
+              <span className="logo-icon">📦</span>
+              <span className="logo-text">Gestion Stock<span className="accent-text"> Agricole</span></span>
+            </div>
           </div>
-          <ul className="nav-links">
-            <li>
-              {/* NavLink ajoute automatiquement une classe "active" quand la route correspond */}
-              <NavLink 
-                to="/" 
-                className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}
-              >
-                📊 Tableau de bord
-              </NavLink>
-            </li>
-            <li>
-              <NavLink 
-                to="/ajouter" 
-                className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}
-              >
-                ➕ Ajouter un produit
-              </NavLink>
-            </li>
-          </ul>
+          
+          <div className="sidebar-menu">
+            <span className="menu-divider">Navigation</span>
+            <ul className="nav-links">
+              <li>
+                <NavLink 
+                  to="/" 
+                  className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}
+                >
+                  <span className="item-icon">📊</span>
+                  <span className="item-text">Dashboard</span>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink 
+                  to="/ajouter" 
+                  className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}
+                >
+                  <span className="item-icon">➕</span>
+                  <span className="item-text">Ajouter produit</span>
+                </NavLink>
+              </li>
+            </ul>
+          </div>
+          
+          {/* Footer de la sidebar optionnel pour le style */}
+          <div className="sidebar-footer">
+            <p>v1.0.0 — MERN Stack</p>
+          </div>
         </nav>
 
-        {/* --- ZONE DE CONTENU DYNAMIQUE --- */}
+        {/* --- ZONE DE CONTENU PRINCIPALE --- */}
         <main className="content-area">
-          <Routes>
-            {/* Route pour le Dashboard (Page d'accueil) */}
-            <Route path="/" element={<Dashboard />} />
-            
-            {/* Route pour le Formulaire d'ajout */}
-            <Route path="/ajouter" element={<AjoutProduit />} />
-            
-            {/* Route de secours (404) si l'utilisateur tape une URL inexistante */}
-            <Route path="*" element={
-              <div style={{ padding: "40px", textAlign: "center" }}>
-                <h2>Page introuvable 404</h2>
-                <Link to="/">Retour au Tableau de Bord</Link>
-              </div>
-            } />
-          </Routes>
+          <div className="content-card-wrapper">
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/ajouter" element={<AjoutProduit />} />
+              <Route path="*" element={
+                <div className="error-404">
+                  <h2>Page introuvable 404</h2>
+                  <p>La page que vous recherchez n'existe pas.</p>
+                  <Link to="/" className="btn-back">Retour au Tableau de Bord</Link>
+                </div>
+              } />
+            </Routes>
+          </div>
         </main>
+
       </div>
     </Router>
   );

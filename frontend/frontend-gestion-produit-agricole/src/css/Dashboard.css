@@ -1,7 +1,7 @@
 .dashboard-container {
   max-width: 1000px;
-  margin: 10px auto;
-  padding: 20px;
+  margin: 5px auto;
+  padding: 10px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #333;
 }
