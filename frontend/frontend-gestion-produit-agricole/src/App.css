@@ -1,0 +1,65 @@
+/* Structure globale */
+body {
+  margin: 0;
+  background-color: #f4f6f9;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Style de la barre de navigation */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #1e293b; /* Couleur sombre pro (slate) */
+  padding: 0 40px;
+  height: 65px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.nav-logo {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 20px;
+}
+
+/* Style des liens de navigation */
+.nav-item {
+  color: #94a3b8;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.nav-item:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Classe activée automatiquement par React Router */
+.nav-item.active {
+  color: #ffffff;
+  background-color: #007bff; /* Bleu d'accentuation */
+}
+
+/* Zone principale de rendu */
+.content-area {
+  flex: 1;
+  padding: 20px;
+  box-sizing: border-box;
+}
