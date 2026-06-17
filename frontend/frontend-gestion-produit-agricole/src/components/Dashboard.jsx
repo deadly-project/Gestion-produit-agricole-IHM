@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios"; // ✅ Correction de l'import d'axios
-import { FaEdit, FaTrash, FaTimes, FaCheckCircle } from "react-icons/fa";
+import axios from "axios"; 
+import { FaEdit, FaTrash, FaTimes, FaCheckCircle, FaExclamationCircle } from "react-icons/fa"; // ✅ Ajout de FaExclamationCircle
 import "../css/Dashboard.css";
 
 const Dashboard = () => {
@@ -53,12 +53,11 @@ const Dashboard = () => {
     try {
       await axios.delete(`http://localhost:3000/api/produits/${selectedProduit._id}`);
       
-      // 🟢 Mise à jour de l'état UI côté Front-end instantanément
       setProduits(produits.filter((p) => p._id !== selectedProduit._id));
       
       setIsDeleteModalOpen(false);
       setSuccessMessage(`Le produit "${selectedProduit.nom}" a bien été supprimé du stock.`);
-      setIsSuccessDeleteOpen(true); // ✅ Déclenche l'affichage de l'alerte OK
+      setIsSuccessDeleteOpen(true); 
     } catch (error) {
       setBackendError(error.response?.data?.message || "Erreur lors de la suppression.");
       setIsDeleteModalOpen(false);
@@ -80,7 +79,7 @@ const Dashboard = () => {
   const handleEditChange = (e) => {
     const { name, value } = e.target;
     if (name === "nom") {
-      if (value !== "" && /^\d+$/.test(value)) return; // Protection anti-numérique pur
+      if (value !== "" && /^\d+$/.test(value)) return;
       setEditFormData({ ...editFormData, [name]: value });
     }
     else if (name === "quantite" || name === "prix") {
@@ -112,13 +111,12 @@ const Dashboard = () => {
         prix: Number(editFormData.prix)
       });
 
-      // 🟢 Remplacement direct et réactif dans la liste du Front-end
       const produitMisAJour = response.data.produit || { ...selectedProduit, ...editFormData, nom: editFormData.nom.trim() };
       setProduits(produits.map((p) => (p._id === selectedProduit._id ? produitMisAJour : p)));
 
       setIsEditModalOpen(false);
       setSuccessMessage(`Le produit "${editFormData.nom.trim()}" a été modifié avec succès.`);
-      setIsSuccessEditOpen(true); // ✅ Déclenche l'affichage de l'alerte OK
+      setIsSuccessEditOpen(true); 
     } catch (error) {
       setBackendError(error.response?.data?.message || "Erreur lors de la modification.");
     }
@@ -348,20 +346,34 @@ const Dashboard = () => {
       )}
 
       {/* ==================================================== */}
-      {/* 🎉 MODALES DE NOTIFICATION DE SUCCÈS (OK)           */}
+      {/* 🎉 MODALE DE SUCCÈS : MODIFICATION (VERTE)          */}
       {/* ==================================================== */}
-      {(isSuccessEditOpen || isSuccessDeleteOpen) && (
+      {isSuccessEditOpen && (
         <div className="modal-overlay">
-          <div className="modal-box success-modal-box" style={{ textAlign: "center", padding: "24px" }}>
-            <FaCheckCircle style={{ color: "#16a34a", fontSize: "48px", marginBottom: "16px" }} />
-            <h3 className="modal-title" style={{ color: "#1e293b", marginBottom: "12px" }}>Opération réussie !</h3>
-            <p className="modal-text" style={{ color: "#475569", marginBottom: "20px" }}>{successMessage}</p>
-            <div style={{ display: "flex", justifyContent: "center" }}>
-              <button 
-                className="btn btn-confirm" 
-                style={{ background: "#16a34a", borderColor: "#16a34a", padding: "8px 24px", color: "#fff", border: "none", borderRadius: "4px", cursor: "pointer" }}
-                onClick={() => fermerSuccesModale(isSuccessEditOpen ? "edit" : "delete")}
-              >
+          <div className="modal-box success-modal-box">
+            <FaCheckCircle className="icon-success-modal" />
+            <h3 className="modal-title-status">Modification réussie !</h3>
+            <p className="modal-text-status">{successMessage}</p>
+            <div className="modal-actions-center">
+              <button className="btn btn-ok-success" onClick={() => fermerSuccesModale("edit")}>
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==================================================== */}
+      {/* 🛑 MODALE DE SUCCÈS : SUPPRESSION (ROUGE)           */}
+      {/* ==================================================== */}
+      {isSuccessDeleteOpen && (
+        <div className="modal-overlay">
+          <div className="modal-box delete-success-modal-box">
+            <FaCheckCircle className="icon-delete-success-modal" />
+            <h3 className="modal-title-status">Produit Supprimé !</h3>
+            <p className="modal-text-status">{successMessage}</p>
+            <div className="modal-actions-center">
+              <button className="btn btn-ok-delete" onClick={() => fermerSuccesModale("delete")}>
                 OK
               </button>
             </div>
