@@ -369,7 +369,7 @@ const Dashboard = () => {
         <div className="modal-overlay">
           <div className="modal-box status-glass-modal border-top-danger">
             <FaExclamationCircle className="icon-status-danger animate-scale" />
-            <h3 className="modal-title-status" style={{ color: "#e11d48" }}>Destruction réussie</h3>
+            <h3 className="modal-title-status" style={{ color: "#e11d48" }}>Suppression réussie</h3>
             <p className="modal-text-status">{successMessage}</p>
             <button className="btn-status-ok bg-danger-btn" onClick={() => fermerSuccesModale("delete")}>OK</button>
           </div>

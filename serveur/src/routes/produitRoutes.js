@@ -19,8 +19,21 @@ router.post("/", async (req, res) => {
             });
         }
 
+        const produitExistant = await Produit.findOne({
+            nom: {
+                $regex: `^${nom.trim()}$`,
+                $options: "i"
+            }
+        });
+
+        if (produitExistant) {
+            return res.status(409).json({
+                message: "Ce produit existe déjà."
+            });
+        }
+
         const produit = new Produit({
-            nom,
+            nom: nom.trim(),
             unite,
             quantite,
             prix
@@ -47,7 +60,6 @@ router.post("/", async (req, res) => {
 
     }
 });
-
 
 // ======================
 // READ ALL
