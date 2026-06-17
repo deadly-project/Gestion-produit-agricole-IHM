@@ -431,6 +431,7 @@
   background-color: var(--gray-100);
   border: 2px solid var(--gray-200);
   color: var(--gray-700);
+  margin-top: 30px;
   padding: 10px 18px;
   border-radius: var(--radius-sm);
   font-size: 13px;

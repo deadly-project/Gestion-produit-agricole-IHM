@@ -61,7 +61,7 @@ function App() {
           
           {/* Footer de la sidebar optionnel pour le style */}
           <div className="sidebar-footer">
-            <p>v1.0.0 — MERN Stack</p>
+            <p>Deadly-project --- v1.0</p>
           </div>
         </nav>
 
