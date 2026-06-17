@@ -1,3 +1,6 @@
+/* ==========================================================================
+   📦 CONFIGURATION GLOBALE & CONTENEUR DE L'HISTORIQUE
+   ========================================================================== */
 .historique-container {
   max-width: 850px;
   margin: 30px auto;
@@ -12,10 +15,12 @@
   margin-bottom: 35px;
 }
 
-/* --- STRUCTURE TIMELINE --- */
+/* ==========================================================================
+   📜 STRUCTURE EN LIGNE DE TEMPS (TIMELINE)
+   ========================================================================== */
 .timeline {
   position: relative;
-  border-left: 3px solid #cbd5e1; /* Ligne centrale verticale */
+  border-left: 3px solid #cbd5e1;
   margin-left: 20px;
   padding-left: 30px;
 }
@@ -25,10 +30,9 @@
   margin-bottom: 30px;
 }
 
-/* Positionnement des cercles d'icônes sur la ligne */
 .timeline-icon {
   position: absolute;
-  left: -51px; /* Centre parfaitement sur la bordure gauche */
+  left: -51px;
   top: 4px;
   width: 38px;
   height: 38px;
@@ -39,16 +43,22 @@
   align-items: center;
   justify-content: center;
   font-size: 16px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
-/* Cartes de contenu */
+/* Cartes de contenu de la timeline */
 .timeline-content {
   background: #ffffff;
   padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
   border: 1px solid #e2e8f0;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.timeline-content:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
 }
 
 .timeline-header {
@@ -71,9 +81,22 @@
   font-weight: 600;
 }
 
-/* --- COULEURS DES BADGES D'ACTION --- */
+.timeline-body-layout {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.timeline-body-main {
+  flex: 1;
+}
+
+/* ==========================================================================
+   🏷️ COULEURS DES BADGES D'ACTION (TIMELINE)
+   ========================================================================== */
 .action-tag {
-  padding: 4px 10px;
+  padding: 4px 12px;
   border-radius: 20px;
   font-size: 11px;
   font-weight: 700;
@@ -81,28 +104,24 @@
   letter-spacing: 0.5px;
 }
 
-/* Vert pour Ajout */
 .action-ajout {
   color: #16a34a !important;
   background-color: #dcfce7;
-  border-color: #16a34a;
 }
 
-/* Bleu/Orange pour Modification */
 .action-modif {
   color: #d97706 !important;
   background-color: #fef3c7;
-  border-color: #d97706;
 }
 
-/* Rouge pour Suppression */
 .action-suppr {
   color: #dc3545 !important;
   background-color: #fde8e8;
-  border-color: #dc3545;
 }
 
-/* --- ZONE DE COMPARAISON DES VALEURS (HISTORIQUE) --- */
+/* ==========================================================================
+   🔍 ZONE DE COMPARAISON PROVISOIRE DANS LA CARTE (TIMELINE)
+   ========================================================================== */
 .change-details {
   font-size: 14px;
   color: #475569;
@@ -111,7 +130,7 @@
 .compare-box {
   background-color: #f8fafc;
   padding: 12px 16px;
-  border-radius: 6px;
+  border-radius: 8px;
   border-left: 3px solid #cbd5e1;
   display: flex;
   flex-direction: column;
@@ -147,9 +166,337 @@
   color: #1e293b;
 }
 
+/* Bouton "Vérifier" */
+.btn-verify {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-verify:hover {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.25);
+}
+
+/* ==========================================================================
+   ❌ ÉTATS DE CHARGEMENT & ERREUR
+   ========================================================================== */
 .no-historique, .historique-loading {
   text-align: center;
   padding: 40px;
   color: #64748b;
   font-style: italic;
+}
+
+/* ==========================================================================
+   ⚡ MODALE D'AUDIT COMPACTE AVEC PROTECTION ANTI-DEBORDEMENT
+   ========================================================================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  animation: fadeIn 0.2s ease;
+}
+
+.audit-modal-box {
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+  max-width: 700px !important;
+  width: 90%;
+  max-height: 85vh; /* 🔒 Sécurité : Bloque la hauteur pour éviter de dépasser l'écran */
+  display: flex;
+  flex-direction: column; /* Force l'alignement vertical rigide */
+  animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+/* En-tête fixé haut */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  background-color: #ffffff;
+}
+
+.modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.close-modal-btn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 18px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.close-modal-btn:hover {
+  color: #64748b;
+}
+
+/* 📜 ZONE DU MILIEU DÉFILANTE (Scrolle en interne si le tableau est long) */
+.audit-modal-body {
+  padding: 16px 20px;
+  overflow-y: auto; /* Active la barre de défilement uniquement ici */
+  flex: 1; 
+}
+
+/* Grille d'en-tête technique */
+.audit-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+  background-color: #f8fafc;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  border: 1px solid #e2e8f0;
+}
+
+.code-id {
+  background-color: #e2e8f0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  color: #334155;
+}
+
+.audit-table-title {
+  font-size: 12px;
+  color: #64748b;
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   📊 TABLEAU DE COMPARAISON IHM (MODALE)
+   ========================================================================== */
+.audit-compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 4px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.audit-compare-table th {
+  background-color: #f8fafc;
+  color: #475569;
+  text-align: left;
+  padding: 10px 14px;
+  font-weight: 600;
+  font-size: 13px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.audit-compare-table td {
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #334155;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.audit-field-label {
+  font-weight: 600;
+  color: #334155;
+}
+
+.audit-val-old {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.audit-val-new {
+  font-weight: 500;
+  color: #0f172a;
+}
+
+/* 🟠 STYLE MODIFICATION : SURBRILLANCE EN ORANGE */
+.row-changed-highlight {
+  background-color: #fff7ed !important; 
+}
+
+.row-changed-highlight td {
+  border-bottom: 1px solid #ffedd5;
+}
+
+.row-changed-highlight .audit-field-label {
+  color: #c2410c; 
+}
+
+.row-changed-highlight .audit-val-new {
+  color: #ea580c; 
+  font-weight: 700;
+}
+
+.orange-dot {
+  color: #ea580c;
+  margin-left: 6px;
+  font-size: 10px;
+}
+
+/* 🟢 STYLE AJOUT : CELLULES EN VERT POUR LES NOUVELLES ENTRÉES */
+.audit-modal-box:has(.action-ajout) .audit-val-new {
+  color: #155724;
+  font-weight: 600;
+  background-color: #f0fdf4; /* Fond vert clair discret sur la colonne insérée */
+}
+
+/* ==========================================================================
+   🧱 PIED DE MODALE FIXÉ (BOUTONS)
+   ========================================================================== */
+.modal-actions {
+  padding: 12px 20px;
+  background-color: #f8fafc;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn-cancel {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-cancel:hover {
+  background-color: #f1f5f9;
+  color: #1e293b;
+  border-color: #94a3b8;
+}
+
+/* ==========================================================================
+   🎬 ANIMATIONS ET RESPONSIVE
+   ========================================================================== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(15px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@media (max-width: 600px) {
+  .timeline-body-layout {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .btn-verify {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ==========================================================================
+   🛠️ BARRE D'OUTILS DE FILTRE & TRI
+   ========================================================================== */
+.historique-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  background-color: #ffffff;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 24px;
+}
+
+.toolbar-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.select-filter {
+  background-color: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.select-filter:focus {
+  border-color: #3b82f6;
+}
+
+.btn-sort {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-sort:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
+@media (max-width: 520px) {
+  .historique-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .select-filter, .btn-sort {
+    width: 100%;
+    justify-content: center;
+  }
 }

@@ -17,13 +17,27 @@ const AjoutProduit = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Gestion des changements avec sécurité anti-négatif
+  // Gestion des changements avec sécurité intégrée
   const handleChange = (e) => {
     const { name, value } = e.target;
     
-    if (name === "quantite" || name === "prix") {
+    if (name === "nom") {
+      // Permet les lettres, espaces, tirets et chiffres, mais empêche de commencer par un chiffre ou d'avoir QUE des chiffres
+      // Idéal pour éviter les noms de produits comme "12345"
+      if (value !== "" && /^\d+$/.test(value)) {
+        return; // Bloque si la saisie ne contient que des chiffres
+      }
+      setFormData({ ...formData, [name]: value });
+    } 
+    else if (name === "quantite" || name === "prix") {
+      // Si le champ est vide (l'utilisateur a effacé), on stocke une chaîne vide pour le prix
+      if (value === "") {
+        setFormData({ ...formData, [name]: "" });
+        return;
+      }
+
       const numValue = Number(value);
-      if (numValue < 0) return; // Bloque les valeurs négatives
+      if (isNaN(numValue) || numValue < 0) return; // Bloque le texte ou les valeurs négatives
       
       setFormData({
         ...formData,
@@ -43,13 +57,28 @@ const AjoutProduit = () => {
     setBackendError("");
     setSuccessMessage("");
     
-    // Validation stricte côté client
-    if (!formData.nom || !formData.unite || formData.prix === "") {
-      setBackendError("Tous les champs sont obligatoires, y compris le choix de l'unité.");
+    // Trim pour enlever les espaces inutiles au début/fin
+    const nomNettoye = formData.nom.trim();
+
+    // 🚨 VALIDATION STRICTE : Nom du produit
+    // Empêche les noms vides, uniquement composés de chiffres, ou trop courts
+    if (!nomNettoye || /^\d+$/.test(nomNettoye)) {
+      setBackendError("Le nom du produit est invalide. Il ne peut pas être composé uniquement de chiffres.");
       return;
     }
 
-    if (formData.quantite < 0 || formData.prix < 0) {
+    if (nomNettoye.length < 2) {
+      setBackendError("Le nom du produit doit contenir au moins 2 caractères.");
+      return;
+    }
+
+    // 🚨 VALIDATION STRICTE : Unité et Prix
+    if (!formData.unite || formData.prix === "") {
+      setBackendError("Tous les champs sont obligatoires, y compris le choix de l'unité et le prix.");
+      return;
+    }
+
+    if (formData.quantite < 0 || Number(formData.prix) < 0) {
       setBackendError("Les valeurs numériques ne peuvent pas être négatives.");
       return;
     }
@@ -63,8 +92,15 @@ const AjoutProduit = () => {
     setIsLoading(true);
     setBackendError("");
 
+    // Préparation des données propres
+    const dataToSend = {
+      ...formData,
+      nom: formData.nom.trim(),
+      prix: Number(formData.prix)
+    };
+
     try {
-      const response = await axios.post("http://localhost:3000/api/produits", formData);
+      const response = await axios.post("http://localhost:3000/api/produits", dataToSend);
       
       if (response.status === 201 || response.status === 200) {
         setSuccessMessage("Produit créé avec succès !");
@@ -99,6 +135,7 @@ const AjoutProduit = () => {
             name="nom"
             value={formData.nom}
             onChange={handleChange}
+            placeholder="Ex: Chaise de bureau (pas uniquement des chiffres)"
             className="form-input"
             required
           />
@@ -130,7 +167,6 @@ const AjoutProduit = () => {
               className="form-input"
               required
             >
-              {/* Option par défaut vide mais requise */}
               <option value="" disabled>Choisir...</option>
               <option value="pcs">Pièce (pcs)</option>
               <option value="kg">Kilogramme (kg)</option>
@@ -152,6 +188,7 @@ const AjoutProduit = () => {
             name="prix"
             value={formData.prix}
             onChange={handleChange}
+            placeholder="0.00"
             className="form-input"
             step="0.01"
             min="0"
@@ -170,11 +207,11 @@ const AjoutProduit = () => {
           <div className="modal-box">
             <h3 className="modal-title">Confirmer l'ajout ?</h3>
             <p className="modal-text">
-              Voulez-vous vraiment ajouter le produit <strong>{formData.nom}</strong> ?
+              Voulez-vous vraiment ajouter le produit <strong>{formData.nom.trim()}</strong> ?
             </p>
             <div className="modal-summary">
               <p><strong>Quantité :</strong> {formData.quantite} {formData.unite}</p>
-              <p><strong>Prix :</strong> {formData.prix} Ariary</p>
+              <p><strong>Prix :</strong> {Number(formData.prix).toLocaleString()} Ariary</p>
             </div>
             <div className="modal-actions">
               <button className="btn btn-cancel" onClick={() => setIsModalOpen(false)}>

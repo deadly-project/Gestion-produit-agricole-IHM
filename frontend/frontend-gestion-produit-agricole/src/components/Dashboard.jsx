@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { FaEdit, FaTrash, FaTimes } from "react-icons/fa"; // Importation des icônes
+import axios from "axios"; // ✅ Correction de l'import d'axios
+import { FaEdit, FaTrash, FaTimes, FaCheckCircle } from "react-icons/fa";
 import "../css/Dashboard.css";
 
 const Dashboard = () => {
@@ -16,8 +16,13 @@ const Dashboard = () => {
   // --- NOUVEAUX ÉTATS POUR LA SUPPRESSION & MODIFICATION ---
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedProduit, setSelectedProduit] = useState(null); // Produit ciblé par l'action
+  const [selectedProduit, setSelectedProduit] = useState(null); 
   const [editFormData, setEditFormData] = useState({ nom: "", unite: "", quantite: 0, prix: "" });
+
+  // --- ÉTATS POUR LES ALERTES DE SUCCÈS ---
+  const [isSuccessEditOpen, setIsSuccessEditOpen] = useState(false);
+  const [isSuccessDeleteOpen, setIsSuccessDeleteOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     fetchProduits();
@@ -47,9 +52,13 @@ const Dashboard = () => {
     setBackendError("");
     try {
       await axios.delete(`http://localhost:3000/api/produits/${selectedProduit._id}`);
+      
+      // 🟢 Mise à jour de l'état UI côté Front-end instantanément
+      setProduits(produits.filter((p) => p._id !== selectedProduit._id));
+      
       setIsDeleteModalOpen(false);
-      setSelectedProduit(null);
-      fetchProduits(); // Recharger la liste
+      setSuccessMessage(`Le produit "${selectedProduit.nom}" a bien été supprimé du stock.`);
+      setIsSuccessDeleteOpen(true); // ✅ Déclenche l'affichage de l'alerte OK
     } catch (error) {
       setBackendError(error.response?.data?.message || "Erreur lors de la suppression.");
       setIsDeleteModalOpen(false);
@@ -70,9 +79,17 @@ const Dashboard = () => {
 
   const handleEditChange = (e) => {
     const { name, value } = e.target;
-    if (name === "quantite" || name === "prix") {
+    if (name === "nom") {
+      if (value !== "" && /^\d+$/.test(value)) return; // Protection anti-numérique pur
+      setEditFormData({ ...editFormData, [name]: value });
+    }
+    else if (name === "quantite" || name === "prix") {
+      if (value === "") {
+        setEditFormData({ ...editFormData, [name]: "" });
+        return;
+      }
       const numValue = Number(value);
-      if (numValue < 0) return; // Anti-négatif
+      if (numValue < 0) return; 
       setEditFormData({ ...editFormData, [name]: numValue });
     } else {
       setEditFormData({ ...editFormData, [name]: value });
@@ -82,14 +99,36 @@ const Dashboard = () => {
   const handleConfirmEditSubmit = async (e) => {
     e.preventDefault();
     setBackendError("");
+
+    if (!editFormData.nom.trim() || /^\d+$/.test(editFormData.nom)) {
+      setBackendError("Le nom du produit n'est pas valide.");
+      return;
+    }
+
     try {
-      await axios.put(`http://localhost:3000/api/produits/${selectedProduit._id}`, editFormData);
+      const response = await axios.put(`http://localhost:3000/api/produits/${selectedProduit._id}`, {
+        ...editFormData,
+        nom: editFormData.nom.trim(),
+        prix: Number(editFormData.prix)
+      });
+
+      // 🟢 Remplacement direct et réactif dans la liste du Front-end
+      const produitMisAJour = response.data.produit || { ...selectedProduit, ...editFormData, nom: editFormData.nom.trim() };
+      setProduits(produits.map((p) => (p._id === selectedProduit._id ? produitMisAJour : p)));
+
       setIsEditModalOpen(false);
-      setSelectedProduit(null);
-      fetchProduits(); // Recharger la liste
+      setSuccessMessage(`Le produit "${editFormData.nom.trim()}" a été modifié avec succès.`);
+      setIsSuccessEditOpen(true); // ✅ Déclenche l'affichage de l'alerte OK
     } catch (error) {
       setBackendError(error.response?.data?.message || "Erreur lors de la modification.");
     }
+  };
+
+  const fermerSuccesModale = (type) => {
+    if (type === "edit") setIsSuccessEditOpen(false);
+    if (type === "delete") setIsSuccessDeleteOpen(false);
+    setSelectedProduit(null);
+    setSuccessMessage("");
   };
 
   // --- LOGIQUE DE FILTRAGE ET DE TRI ---
@@ -218,7 +257,6 @@ const Dashboard = () => {
                   <td>{produit.unite}</td>
                   <td>{produit.prix ? `${produit.prix.toLocaleString()} Ar` : "-"}</td>
                   <td className="total-cell">{((produit.prix || 0) * (produit.quantite || 0)).toLocaleString()} Ar</td>
-                  {/* COLONNE ACTIONS */}
                   <td>
                     <div className="action-buttons">
                       <button className="btn-icon btn-edit" title="Modifier" onClick={() => handleOpenEditModal(produit)}>
@@ -241,7 +279,7 @@ const Dashboard = () => {
       </div>
 
       {/* ==================================================== */}
-      {/* 🔴 MODALE DE CONFIRMATION DE SUPPRESSION (ALERTE IHM) */}
+      {/* 🔴 MODALE DE CONFIRMATION DE SUPPRESSION            */}
       {/* ==================================================== */}
       {isDeleteModalOpen && (
         <div className="modal-overlay">
@@ -305,6 +343,28 @@ const Dashboard = () => {
                 <button type="submit" className="btn btn-confirm">Mettre à jour</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ==================================================== */}
+      {/* 🎉 MODALES DE NOTIFICATION DE SUCCÈS (OK)           */}
+      {/* ==================================================== */}
+      {(isSuccessEditOpen || isSuccessDeleteOpen) && (
+        <div className="modal-overlay">
+          <div className="modal-box success-modal-box" style={{ textAlign: "center", padding: "24px" }}>
+            <FaCheckCircle style={{ color: "#16a34a", fontSize: "48px", marginBottom: "16px" }} />
+            <h3 className="modal-title" style={{ color: "#1e293b", marginBottom: "12px" }}>Opération réussie !</h3>
+            <p className="modal-text" style={{ color: "#475569", marginBottom: "20px" }}>{successMessage}</p>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <button 
+                className="btn btn-confirm" 
+                style={{ background: "#16a34a", borderColor: "#16a34a", padding: "8px 24px", color: "#fff", border: "none", borderRadius: "4px", cursor: "pointer" }}
+                onClick={() => fermerSuccesModale(isSuccessEditOpen ? "edit" : "delete")}
+              >
+                OK
+              </button>
+            </div>
           </div>
         </div>
       )}
