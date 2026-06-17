@@ -126,7 +126,7 @@ const MouvementStock = () => {
             <input
               type="text"
               id="produitSearch"
-              placeholder="Tapez le nom pour rechercher..."
+              placeholder="Cliquer ou Tapez le nom pour rechercher..."
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
@@ -141,7 +141,7 @@ const MouvementStock = () => {
           </div>
 
           {/* Liste déroulante des résultats filtrés */}
-          {isDropdownOpen && searchTerm !== "" && (
+          {isDropdownOpen  && (
             <ul className="autocomplete-dropdown">
               {produitsFilitres.length > 0 ? (
                 produitsFilitres.map((p) => (

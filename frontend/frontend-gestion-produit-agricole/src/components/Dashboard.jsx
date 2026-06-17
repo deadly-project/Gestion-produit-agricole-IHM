@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios"; 
-import { FaEdit, FaTrash, FaTimes, FaCheckCircle, FaExclamationCircle } from "react-icons/fa"; // ✅ Ajout de FaExclamationCircle
+import { FaEdit, FaTrash, FaTimes, FaCheckCircle, FaExclamationCircle, FaBoxes, FaDollarSign, FaSearch, FaSlidersH } from "react-icons/fa";
 import "../css/Dashboard.css";
 
 const Dashboard = () => {
-  // --- ÉTATS EXISTANTS ---
+  // --- ÉTATS ---
   const [produits, setProduits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [backendError, setBackendError] = useState("");
@@ -13,13 +13,11 @@ const Dashboard = () => {
   const [filterQuantiteMax, setFilterQuantiteMax] = useState("");
   const [sortBy, setSortBy] = useState("az");
 
-  // --- NOUVEAUX ÉTATS POUR LA SUPPRESSION & MODIFICATION ---
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedProduit, setSelectedProduit] = useState(null); 
   const [editFormData, setEditFormData] = useState({ nom: "", unite: "", quantite: 0, prix: "" });
 
-  // --- ÉTATS POUR LES ALERTES DE SUCCÈS ---
   const [isSuccessEditOpen, setIsSuccessEditOpen] = useState(false);
   const [isSuccessDeleteOpen, setIsSuccessDeleteOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -41,7 +39,7 @@ const Dashboard = () => {
     }
   };
 
-  // --- LOGIQUE DE SUPPRESSION ---
+  // --- SUPPRESSION ---
   const handleOpenDeleteModal = (produit) => {
     setSelectedProduit(produit);
     setIsDeleteModalOpen(true);
@@ -52,11 +50,9 @@ const Dashboard = () => {
     setBackendError("");
     try {
       await axios.delete(`http://localhost:3000/api/produits/${selectedProduit._id}`);
-      
       setProduits(produits.filter((p) => p._id !== selectedProduit._id));
-      
       setIsDeleteModalOpen(false);
-      setSuccessMessage(`Le produit "${selectedProduit.nom}" a bien été supprimé du stock.`);
+      setSuccessMessage(`Le produit "${selectedProduit.nom}" a bien été supprimé.`);
       setIsSuccessDeleteOpen(true); 
     } catch (error) {
       setBackendError(error.response?.data?.message || "Erreur lors de la suppression.");
@@ -64,7 +60,7 @@ const Dashboard = () => {
     }
   };
 
-  // --- LOGIQUE DE MODIFICATION ---
+  // --- MODIFICATION ---
   const handleOpenEditModal = (produit) => {
     setSelectedProduit(produit);
     setEditFormData({
@@ -129,7 +125,7 @@ const Dashboard = () => {
     setSuccessMessage("");
   };
 
-  // --- LOGIQUE DE FILTRAGE ET DE TRI ---
+  // --- FILTRES ET TRI ---
   const produitsTraites = produits
     .filter((produit) => {
       const matchNom = produit.nom.toLowerCase().includes(filterNom.toLowerCase());
@@ -146,47 +142,58 @@ const Dashboard = () => {
   const totalProduits = produits.length;
   const chiffreAffaireGlobal = produits.reduce((total, p) => total + ((p.prix || 0) * (p.quantite || 0)), 0);
 
-  if (loading) return <div className="dashboard-loading">Chargement du tableau de bord...</div>;
+  if (loading) return <div className="dashboard-loading"><div className="spinner"></div>Chargement des stocks...</div>;
 
   return (
     <div className="dashboard-container">
-      <h2 className="dashboard-title">Tableau de Bord des Stocks</h2>
+      <header className="dashboard-header-zone">
+        <h2 className="dashboard-title">Tableau de Bord des Stocks</h2>
+        <p className="dashboard-subtitle-global">Gérez et suivez l'état de vos inventaires en temps réel.</p>
+      </header>
 
       {backendError && <div className="alert alert-danger">{backendError}</div>}
 
       {/* --- SECTION DES BLOCS KPI --- */}
       <div className="kpi-grid">
-        <div className="kpi-card">
+        <div className="kpi-card card-blue">
           <div className="kpi-info">
-            <span className="kpi-label">Nombre de Références</span>
+            <span className="kpi-label">Nombre de Produits</span>
             <span className="kpi-value">{totalProduits}</span>
           </div>
-          <div className="kpi-icon icon-box">📦</div>
+          <div className="kpi-icon-wrapper"><FaBoxes /></div>
         </div>
 
-        <div className="kpi-card kpi-ca">
+        <div className="kpi-card card-green">
           <div className="kpi-info">
-            <span className="kpi-label">Valeur Totale du Stock (CA)</span>
-            <span className="kpi-value">{chiffreAffaireGlobal.toLocaleString()} Ariary</span>
+            <span className="kpi-label">Valeur Totale du Stock</span>
+            <span className="kpi-value">
+              {chiffreAffaireGlobal.toLocaleString()} <span className="currency">Ar</span>
+            </span>
           </div>
-          <div className="kpi-icon icon-money">💰</div>
+          <div className="kpi-icon-wrapper"><FaDollarSign /></div>
         </div>
       </div>
 
       {/* --- SECTION DES FILTRES ET TRIS --- */}
       <div className="filter-section">
-        <h3 className="section-subtitle">Filtres de recherche et Tri</h3>
+        <div className="filter-header-inline">
+          <FaSlidersH className="filter-title-icon" />
+          <h3 className="section-subtitle">Filtres et outils de tri</h3>
+        </div>
         <div className="filter-row">
-          <div className="filter-group">
-            <label htmlFor="searchNom">Rechercher par nom</label>
-            <input
-              type="text"
-              id="searchNom"
-              placeholder="Ex: Huile, Riz..."
-              value={filterNom}
-              onChange={(e) => setFilterNom(e.target.value)}
-              className="form-input"
-            />
+          <div className="filter-group search-input-wrapper">
+            <label htmlFor="searchNom">Rechercher un produit</label>
+            <div className="input-with-icon">
+              <FaSearch className="inner-input-icon" />
+              <input
+                type="text"
+                id="searchNom"
+                placeholder="Ex: Huile, Riz..."
+                value={filterNom}
+                onChange={(e) => setFilterNom(e.target.value)}
+                className="form-input text-indent-icon"
+              />
+            </div>
           </div>
 
           <div className="filter-group">
@@ -214,10 +221,10 @@ const Dashboard = () => {
           </div>
 
           <div className="filter-group">
-            <label htmlFor="sortBySelect">Trier l'affichage par</label>
-            <select id="sortBySelect" value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="form-input">
+            <label htmlFor="sortBySelect">Trier par</label>
+            <select id="sortBySelect" value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="form-input select-custom">
               <option value="az">Nom : de A à Z</option>
-              <option value="qty_asc">Quantité : du + petit au + grand</option>
+              <option value="qty_asc">Quantité : Ordre croissant</option>
             </select>
           </div>
           
@@ -235,32 +242,32 @@ const Dashboard = () => {
           <thead>
             <tr>
               <th>Nom du produit</th>
-              <th>Quantité en stock</th>
+              <th>État / Quantité</th>
               <th>Unité</th>
               <th>Prix Unitaire</th>
               <th>Valeur du Stock</th>
-              <th>Actions</th>
+              <th style={{ textAlign: "right" }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {produitsTraites.length > 0 ? (
               produitsTraites.map((produit) => (
-                <tr key={produit._id}>
+                <tr key={produit._id} className="table-hover-row">
                   <td className="product-name-cell">{produit.nom}</td>
                   <td>
                     <span className={`badge ${produit.quantite === 0 ? "badge-danger" : "badge-success"}`}>
-                      {produit.quantite}
+                      {produit.quantite === 0 ? "Rupture" : `${produit.quantite}`}
                     </span>
                   </td>
-                  <td>{produit.unite}</td>
-                  <td>{produit.prix ? `${produit.prix.toLocaleString()} Ar` : "-"}</td>
+                  <td className="text-muted-cell">{produit.unite}</td>
+                  <td className="price-cell">{produit.prix ? `${produit.prix.toLocaleString()} Ar` : "-"}</td>
                   <td className="total-cell">{((produit.prix || 0) * (produit.quantite || 0)).toLocaleString()} Ar</td>
                   <td>
-                    <div className="action-buttons">
-                      <button className="btn-icon btn-edit" title="Modifier" onClick={() => handleOpenEditModal(produit)}>
+                    <div className="action-buttons-end">
+                      <button className="btn-modern-action btn-mod-edit" title="Modifier" onClick={() => handleOpenEditModal(produit)}>
                         <FaEdit />
                       </button>
-                      <button className="btn-icon btn-delete" title="Supprimer" onClick={() => handleOpenDeleteModal(produit)}>
+                      <button className="btn-modern-action btn-mod-delete" title="Supprimer" onClick={() => handleOpenDeleteModal(produit)}>
                         <FaTrash />
                       </button>
                     </div>
@@ -269,57 +276,57 @@ const Dashboard = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="no-data">Aucun produit ne correspond à vos critères.</td>
+                <td colSpan="6" className="no-data">Aucun produit trouvé selon vos critères.</td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
 
-      {/* ==================================================== */}
-      {/* 🔴 MODALE DE CONFIRMATION DE SUPPRESSION            */}
-      {/* ==================================================== */}
+      {/* --- MODALE : CONFIRMATION DE SUPPRESSION --- */}
       {isDeleteModalOpen && (
         <div className="modal-overlay">
-          <div className="modal-box modal-danger">
-            <h3 className="modal-title">⚠️ Attention : Action Irréversible</h3>
-            <p className="modal-text">
-              Voulez-vous vraiment supprimer définitivement le produit <strong>{selectedProduit?.nom}</strong> du stock ?
+          <div className="modal-box glass-modal modal-danger-border">
+            <div className="modal-danger-header-icon"><FaExclamationCircle /></div>
+            <h3 className="modal-title-modern">Action Irréversible</h3>
+            <p className="modal-text-modern">
+              Voulez-vous supprimer définitivement <strong>{selectedProduit?.nom}</strong> ? Cette action videra son emplacement physique en base.
             </p>
-            <div className="modal-actions">
-              <button className="btn btn-cancel" onClick={() => setIsDeleteModalOpen(false)}>Annuler</button>
-              <button className="btn btn-confirm-delete" onClick={handleConfirmDelete}>Supprimer définitivement</button>
+            <div className="modal-actions-modern">
+              <button className="btn-modern btn-secondary-mod" onClick={() => setIsDeleteModalOpen(false)}>Annuler</button>
+              <button className="btn-modern btn-danger-mod" onClick={handleConfirmDelete}>Confirmer la suppression</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* ==================================================== */}
-      {/* 📝 MODALE FORMULAIRE DE MODIFICATION                */}
-      {/* ==================================================== */}
+      {/* --- MODALE : FORMULAIRE DE MODIFICATION --- */}
       {isEditModalOpen && (
         <div className="modal-overlay">
-          <div className="modal-box modal-edit-box">
-            <div className="modal-header">
-              <h3 className="modal-title">Modifier le produit</h3>
-              <button className="close-modal-btn" onClick={() => setIsEditModalOpen(false)}><FaTimes /></button>
+          <div className="modal-box glass-modal modal-edit-box-modern">
+            <div className="modal-header-modern">
+              <div>
+                <h3 className="modal-title-modern" style={{ margin: 0 }}>Modifier la référence</h3>
+                <span className="modal-subtitle-modern">ID: {selectedProduit?._id}</span>
+              </div>
+              <button className="close-modal-btn-modern" onClick={() => setIsEditModalOpen(false)}><FaTimes /></button>
             </div>
             
-            <form onSubmit={handleConfirmEditSubmit} className="product-form">
-              <div className="form-group">
-                <label>Nom du produit <span className="required">*</span></label>
-                <input type="text" name="nom" value={editFormData.nom} onChange={handleEditChange} className="form-input" required />
+            <form onSubmit={handleConfirmEditSubmit} className="product-form-modern">
+              <div className="form-group-modern">
+                <label className="label-modern">Nom du produit <span className="required">*</span></label>
+                <input type="text" name="nom" value={editFormData.nom} onChange={handleEditChange} className="form-input-modern" required />
               </div>
 
-              <div className="form-row">
-                <div className="form-group col">
-                  <label>Quantité <span className="required">*</span></label>
-                  <input type="number" name="quantite" value={editFormData.quantite} onChange={handleEditChange} className="form-input" min="0" required />
+              <div className="form-row-modern">
+                <div className="form-group-modern flex-1">
+                  <label className="label-modern">Quantité <span className="required">*</span></label>
+                  <input type="number" name="quantite" value={editFormData.quantite} onChange={handleEditChange} className="form-input-modern" min="0" required />
                 </div>
 
-                <div className="form-group col">
-                  <label>Unité <span className="required">*</span></label>
-                  <select name="unite" value={editFormData.unite} onChange={handleEditChange} className="form-input" required>
+                <div className="form-group-modern flex-1">
+                  <label className="label-modern">Unité <span className="required">*</span></label>
+                  <select name="unite" value={editFormData.unite} onChange={handleEditChange} className="form-input-modern select-custom" required>
                     <option value="pcs">Pièce (pcs)</option>
                     <option value="kg">Kilogramme (kg)</option>
                     <option value="g">Gramme (g)</option>
@@ -331,52 +338,40 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="form-group">
-                <label>Prix (Ariary) <span className="required">*</span></label>
-                <input type="number" name="prix" value={editFormData.prix} onChange={handleEditChange} className="form-input" step="0.01" min="0" required />
+              <div className="form-group-modern">
+                <label className="label-modern">Prix de vente (Ariary) <span className="required">*</span></label>
+                <input type="number" name="prix" value={editFormData.prix} onChange={handleEditChange} className="form-input-modern" step="0.01" min="0" required />
               </div>
 
-              <div className="modal-actions">
-                <button type="button" className="btn btn-cancel" onClick={() => setIsEditModalOpen(false)}>Annuler</button>
-                <button type="submit" className="btn btn-confirm">Mettre à jour</button>
+              <div className="modal-actions-modern mt-4">
+                <button type="button" className="btn-modern btn-secondary-mod" onClick={() => setIsEditModalOpen(false)}>Annuler</button>
+                <button type="submit" className="btn-modern btn-primary-mod">Enregistrer les modifications</button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* ==================================================== */}
-      {/* 🎉 MODALE DE SUCCÈS : MODIFICATION (VERTE)          */}
-      {/* ==================================================== */}
+      {/* --- MODALE : SUCCÈS MODIFICATION (VERTE) --- */}
       {isSuccessEditOpen && (
         <div className="modal-overlay">
-          <div className="modal-box success-modal-box">
-            <FaCheckCircle className="icon-success-modal" />
-            <h3 className="modal-title-status">Modification réussie !</h3>
+          <div className="modal-box status-glass-modal border-top-success">
+            <FaCheckCircle className="icon-status-success animate-scale" />
+            <h3 className="modal-title-status">Mise à jour réussie</h3>
             <p className="modal-text-status">{successMessage}</p>
-            <div className="modal-actions-center">
-              <button className="btn btn-ok-success" onClick={() => fermerSuccesModale("edit")}>
-                OK
-              </button>
-            </div>
+            <button className="btn-status-ok bg-success-btn" onClick={() => fermerSuccesModale("edit")}>OK</button>
           </div>
         </div>
       )}
 
-      {/* ==================================================== */}
-      {/* 🛑 MODALE DE SUCCÈS : SUPPRESSION (ROUGE)           */}
-      {/* ==================================================== */}
+      {/* --- MODALE : SUCCÈS SUPPRESSION (ROUGE) --- */}
       {isSuccessDeleteOpen && (
         <div className="modal-overlay">
-          <div className="modal-box delete-success-modal-box">
-            <FaCheckCircle className="icon-delete-success-modal" />
-            <h3 className="modal-title-status">Produit Supprimé !</h3>
+          <div className="modal-box status-glass-modal border-top-danger">
+            <FaExclamationCircle className="icon-status-danger animate-scale" />
+            <h3 className="modal-title-status" style={{ color: "#e11d48" }}>Destruction réussie</h3>
             <p className="modal-text-status">{successMessage}</p>
-            <div className="modal-actions-center">
-              <button className="btn btn-ok-delete" onClick={() => fermerSuccesModale("delete")}>
-                OK
-              </button>
-            </div>
+            <button className="btn-status-ok bg-danger-btn" onClick={() => fermerSuccesModale("delete")}>OK</button>
           </div>
         </div>
       )}

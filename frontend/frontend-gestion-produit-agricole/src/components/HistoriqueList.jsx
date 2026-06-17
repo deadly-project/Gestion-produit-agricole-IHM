@@ -33,12 +33,22 @@ const HistoriqueList = () => {
     }
   };
 
-  const formaterDate = (dateString) => {
+  // Sépare la date pour l'affichage de la liste générale
+  const formaterDateComplete = (dateString) => {
     const options = { 
       year: "numeric", month: "long", day: "numeric", 
       hour: "2-digit", minute: "2-digit", second: "2-digit"
     };
     return new Date(dateString).toLocaleDateString("fr-FR", options);
+  };
+
+  // ✅ Fonctions de formatage distinctes pour alléger la modale
+  const extraireDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString("fr-FR", { year: "numeric", month: "long", day: "numeric" });
+  };
+
+  const extraireHeure = (dateString) => {
+    return new Date(dateString).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
   };
 
   const getActionBadge = (action) => {
@@ -88,7 +98,7 @@ const HistoriqueList = () => {
     });
   };
 
-  // --- APPLICATION DYNAMIQUE DES FILTRES ET DU TRI (CÔTÉ CLIENT) ---
+  // --- APPLICATION DYNAMIQUE DES FILTRES ET DU TRI ---
   const historiquesTraites = historiques
     .filter((item) => filtreAction === "TOUS" || item.action === filtreAction)
     .sort((a, b) => {
@@ -105,9 +115,7 @@ const HistoriqueList = () => {
       
       {backendError && <div className="alert alert-danger">{backendError}</div>}
 
-      {/* ==================================================== */}
-      /* 🛠️ BARRE DE FILTRES ET TRI COMPACTE                 */
-      {/* ==================================================== */}
+      {/* Barre de filtres et tri */}
       <div className="historique-toolbar">
         <div className="toolbar-filter">
           <FaFilter className="icon-label" />
@@ -140,7 +148,7 @@ const HistoriqueList = () => {
         </button>
       </div>
 
-      {/* Rendu principal de la liste traitée */}
+      {/* Liste principale */}
       {historiquesTraites.length === 0 ? (
         <div className="no-historique">Aucune activité ne correspond à vos critères de recherche.</div>
       ) : (
@@ -159,13 +167,13 @@ const HistoriqueList = () => {
                 <div className="timeline-content">
                   <div className="timeline-header">
                     <span className={`action-tag ${badge.className}`}>{badge.text}</span>
-                    <span className="timeline-date">{formaterDate(item.dateAction)}</span>
+                    <span className="timeline-date">{formaterDateComplete(item.dateAction)}</span>
                   </div>
 
                   <div className="timeline-body-layout">
                     <div className="timeline-body-main">
                       <h3 className="product-title-his">
-                        {produitInfos?.nom || `Produit (ID: ${item.produitId})`}
+                        {produitInfos?.nom || "Produit non identifié"}
                       </h3>
 
                       <div className="change-details">
@@ -210,34 +218,40 @@ const HistoriqueList = () => {
       )}
 
       {/* ==================================================== */}
-      {/* 🔍 MODALE DE VÉRIFICATION DESIGN TABLEAU COMPARATIF */}
+      {/* 🔍 MODALE DE VÉRIFICATION ALLÉGÉE ET PURIFIÉE        */}
       {/* ==================================================== */}
       {isModalOpen && selectedAudit && (
         <div className="modal-overlay">
           <div className="modal-box audit-modal-box">
             <div className="modal-header">
-              <h3 className="modal-title">Inspecteur de données d'inventaire</h3>
+              <h3 className="modal-title">Inspecteur d'activité</h3>
               <button className="close-modal-btn" onClick={() => setIsModalOpen(false)}>
                 <FaTimes />
               </button>
             </div>
             
             <div className="audit-modal-body">
+              {/* Métadonnées épurées : ID supprimé, Date et Heure bien distinctes */}
               <div className="audit-meta-grid">
-                <div><strong>Type d'action :</strong> <span className={`action-tag ${getActionBadge(selectedAudit.action).className}`}>{selectedAudit.action}</span></div>
-                <div><strong>Date & Heure :</strong> {formaterDate(selectedAudit.dateAction)}</div>
-                <div><strong>ID Produit :</strong> <code className="code-id">{selectedAudit.produitId}</code></div>
+                <div>
+                  <strong>Action :</strong>{" "}
+                  <span className={`action-tag ${getActionBadge(selectedAudit.action).className}`}>
+                    {getActionBadge(selectedAudit.action).text}
+                  </span>
+                </div>
+                <div><strong>Date :</strong> {extraireDate(selectedAudit.dateAction)}</div>
+                <div><strong>Heure :</strong> {extraireHeure(selectedAudit.dateAction)}</div>
               </div>
 
-              <h4 className="audit-table-title">Comparatif des attributs du document</h4>
+              <h4 className="audit-table-title">Comparatif des modifications</h4>
               
               <div className="table-responsive">
                 <table className="audit-compare-table">
                   <thead>
                     <tr>
-                      <th>Champ / Propriété</th>
-                      <th>Valeur Avant (Ancienne)</th>
-                      <th>Valeur Après (Nouvelle)</th>
+                      <th>Propriété</th>
+                      <th>Valeur Ancienne</th>
+                      <th>Valeur Nouvelle</th>
                     </tr>
                   </thead>
                   <tbody>
